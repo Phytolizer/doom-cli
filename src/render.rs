@@ -88,7 +88,7 @@ pub(crate) fn batch_render(
                 .allow_empty(true)
                 .interact_text()
                 .unwrap_or_else(|e| {
-                    job_sender.send(Err(Error::Io(e))).unwrap();
+                    job_sender.send(Err(e.into())).unwrap();
                     String::new()
                 });
 
@@ -201,8 +201,7 @@ pub(crate) fn batch_render(
                     if !renderings.is_empty() { "batch" } else { "" }
                 ))
                 .allow_empty(true)
-                .interact()
-                .map_err(Error::Io)?;
+                .interact()?;
         } else {
             CANCELLABLE.store(true, Ordering::SeqCst);
             info!("Continuing batch rendering in 10 seconds. Press <C-c> to add more demos to the queue.");
