@@ -1,7 +1,7 @@
 [package]
 name = "playdoom"
 version = "0.8.2"
-authors = ["Kyle Coffey <me@phytolizer.dev>"]
+authors = ["Kyle Coffey <kyle@kylecoffey.com>"]
 edition = "2021"
 
 [dependencies]
