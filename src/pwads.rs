@@ -3,9 +3,8 @@ use std::path::PathBuf;
 
 use crate::error::Error;
 use crate::search::search_file;
-use crate::search::search_file_by;
+use crate::search::search_path_by;
 use crate::FileType;
-use crate::ARG_SEPARATOR;
 
 pub(crate) struct Pwads {
     wads: Vec<PathBuf>,
@@ -42,13 +41,13 @@ impl Pwads {
 }
 
 pub(crate) fn parse_arg_pwads(
-    arg_pwads_raw: &str,
+    arg_pwads_raw: &[PathBuf],
     viddump_folder_name: &mut Vec<String>,
     pwads: &mut Pwads,
 ) -> Result<(), Error> {
     let mut arg_pwads = vec![];
-    for pwad in arg_pwads_raw.split(ARG_SEPARATOR) {
-        let mut pwad_files = search_file_by(pwad, FileType::Pwad, |f| {
+    for pwad in arg_pwads_raw {
+        let mut pwad_files = search_path_by(pwad, FileType::Pwad, |f| {
             f.extension()
                 .and_then(|ext| ext.to_str())
                 .map(|ext| {
@@ -73,18 +72,15 @@ pub(crate) fn parse_arg_pwads(
         );
         let i = if pwad_files.len() > 1 {
             dialoguer::Select::new()
-                .items(
-                    pwad_files
-                        .iter()
-                        .map(|p| p.to_string_lossy())
-                        .collect::<Vec<_>>()
-                        .as_ref(),
-                )
+                .items(pwad_files.iter().map(|p| p.to_string_lossy()))
                 .with_prompt(
-                    format!("Multiple results were found for {}. Select one.", pwad).as_str(),
+                    format!(
+                        "Multiple results were found for {}. Select one.",
+                        pwad.display()
+                    )
+                    .as_str(),
                 )
-                .interact()
-                .map_err(Error::Io)?
+                .interact()?
         } else {
             0
         };
@@ -106,28 +102,6 @@ pub(crate) fn parse_arg_pwads(
             "deh" | "bex" => pwads.add_deh(pwad),
             _ => unreachable!(),
         }
-    }
-    Ok(())
-}
-
-pub(crate) fn parse_extra_pwads(extra_pwads_raw: &str, pwads: &mut Pwads) -> Result<(), Error> {
-    for pwad in extra_pwads_raw.split(ARG_SEPARATOR) {
-        let mut found = search_file(pwad, FileType::Pwad)?;
-        let i = if found.len() > 1 {
-            dialoguer::Select::new()
-                .items(
-                    &found
-                        .iter()
-                        .map(|p| p.to_string_lossy())
-                        .collect::<Vec<_>>(),
-                )
-                .with_prompt("Multiple candidates were found. Select one.")
-                .interact()
-                .map_err(Error::Io)?
-        } else {
-            0
-        };
-        pwads.add_wad(found.remove(i));
     }
     Ok(())
 }

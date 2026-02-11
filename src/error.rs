@@ -21,6 +21,8 @@ pub(crate) enum Error {
     Homeless,
     #[error("I/O error: {0}")]
     Io(io::Error),
+    #[error("Dialogue error: {0}")]
+    Dialoguer(#[from] dialoguer::Error),
     #[error("no engines defined")]
     NoEngines,
     #[error("no file stem in '{0}'")]

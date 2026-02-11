@@ -57,7 +57,7 @@ impl Line {
         }
     }
 
-    pub fn iter(&self) -> LineIterator {
+    pub fn iter(&'_ self) -> LineIterator<'_> {
         LineIterator {
             line: self,
             index: 0,

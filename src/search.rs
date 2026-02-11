@@ -26,12 +26,12 @@ pub(crate) fn search_files(list: &[String], ty: FileType) -> Result<Vec<PathBuf>
         .collect()
 }
 
-pub(crate) fn search_file(name: impl AsRef<str>, ty: FileType) -> Result<Vec<PathBuf>, Error> {
+pub(crate) fn search_file(name: impl AsRef<Path>, ty: FileType) -> Result<Vec<PathBuf>, Error> {
     search_file_in_dirs_by(name.as_ref().into(), ty.get_search_dirs()?, |_| true)
 }
 
-pub(crate) fn search_file_by(
-    name: impl AsRef<str>,
+pub(crate) fn search_path_by(
+    name: impl AsRef<Path>,
     ty: FileType,
     predicate: impl Fn(&Path) -> bool,
 ) -> Result<Vec<PathBuf>, Error> {
